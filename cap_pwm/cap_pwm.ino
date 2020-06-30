@@ -11,18 +11,16 @@
 #include "RBD_Capacitance.h"
 
 const uint16_t pulseDelay = 5;
-const uint16_t min_freq = 10;
-const uint32_t system_clock_frequency = 48000000;
+const uint16_t min_freq = 1;
+const uint32_t system_clock_frequency = 72000000;
 
-RBD::Capacitance cap_sensor(2, 3); // send, receive pin
+RBD::Capacitance cap_sensor(PA12, PB7); // send, receive pin
 
 String inString = "";    // string to hold input
 
 //-----------------------------------------------------------------------------
-void toggle_led()
-{
-  digitalWrite(PC13, !digitalRead(PC13));
-}
+//void toggle_led()
+
 
 void generate_pwm(uint16_t prescale, uint16_t reg_counts)
 {
@@ -95,20 +93,21 @@ void setup()
   pinMode(PC13, OUTPUT);
   // setup PA1 (Timer2 channel 2) to PWM (one pulse mode)
   pinMode(PA1, PWM);
+  
 
   // stop the timers before configuring them
   //generate_pwm(72, 100);
   //set_frequency(75);
 }
 
-uint32_t t=0, ff=0;
+  uint32_t t=0, ff=0;
 //-----------------------------------------------------------------------------
 void loop()
 {
   if ( (millis()-t)>=1000 )
   {
     t = millis();
-    toggle_led();
+  
     ff++;
     if ( ff%5 == 0 )
     {
@@ -123,6 +122,7 @@ void loop()
 
   if(cap_sensor.onChange()) {
     unsigned long capValue = cap_sensor.getValue();
-    set_frequency(capValue);
+    unsigned long moddcapv = 6500 - capValue;
+    set_frequency(moddcapv);
   }
 }
